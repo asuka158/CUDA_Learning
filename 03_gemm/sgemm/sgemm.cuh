@@ -112,7 +112,6 @@ namespace sgemm{
         }
     }
 
-    // 尝试将 寄存器 全部改为 float4
     __global__ void sgemm_V2(float * __restrict__ a, float * __restrict__ b, float * __restrict__ c, const int M, const int N, const int K)
     {
         const int bx = blockIdx.x;
