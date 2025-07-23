@@ -10,6 +10,8 @@ cuda学习记录
   -  [cuda_learning_02  内存体系 & reduce优化](https://asuka158.github.io/2024/12/03/cuda-learning-02/#more)
 - Gemm
   - [cuda_learning_03_sgemm_&_hgemm](https://asuka158.github.io/2025/03/25/cuda-learning-03/#more)
+- operator
+  - 部分常见算子
 
 ## Reference
 
