@@ -148,4 +148,4 @@ float testPerformance(
     return sec;
 }
 
-
+// nvcc sgemm_test.cu -o gemm_test -arch=compute_75 -code=sm_75 -lcublas --ptxas-options=-v -O3

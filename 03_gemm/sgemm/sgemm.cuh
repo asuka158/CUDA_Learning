@@ -25,7 +25,6 @@ namespace sgemm{
         }
     }
     
-    //__restrict__ 的作用​​:开发者向编译器保证：在该指针的作用域内，所有通过该指针访问的内存不会通过其他指针或引用被修改。编译器可以据此假设无别名冲突，从而生成更高效的代码。
     __global__ void naiveSgemm(float* __restrict__ a, float* __restrict__ b, float* __restrict__ c, const int M, const int N, const int K)
     {
         int n = blockIdx.x * blockDim.x + threadIdx.x;
@@ -235,6 +234,7 @@ namespace sgemm{
             FLOAT4(s_b[0][load_b_smem_k][load_b_smem_n]) = FLOAT4(r_load_b[0]);
         }
 
+        __syncthreads();
         
         int cnt = (K + BK - 1) / BK;
         for(int bk = 1; bk < cnt; ++bk)

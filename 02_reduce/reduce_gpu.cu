@@ -74,7 +74,13 @@ real reduce(real *d_x, const int method)
         else if(method == 4) reduce_syncwarp<<<grid_size, BLOCK_SIZE, smem>>>(d_x, d_y, N);
         else if(method == 5) reduce_shfl<<<grid_size, BLOCK_SIZE, smem>>>(d_x, d_y, N);
         else if(method == 6) reduce_cp<<<grid_size, BLOCK_SIZE, smem>>>(d_x, d_y, N);
-        else reduce_idle<<<10240, BLOCK_SIZE, smem>>>(d_x, d_y, N);
+        else if(method == 7) reduce_idle<<<10240, BLOCK_SIZE, smem>>>(d_x, d_y, N);
+        else 
+        {
+            const int blockSize = 1024;
+            int gridSize = (N + 4 * blockSize - 1) / (4 * blockSize);
+            reduce_best<blockSize><<<gridSize, blockSize>>>(d_x, d_y, N);
+        }
 
         CHECK(cudaMemcpy(h_y, d_y, sizeof(real), cudaMemcpyDeviceToHost));
         CHECK(cudaFree(d_y));

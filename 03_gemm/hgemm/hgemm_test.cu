@@ -362,3 +362,6 @@ int main() {
         }
     }
 }
+
+// nvcc hgemm_test.cu -o gemm_test -arch=compute_80 -code=sm_80 -lcublas --ptxas-options=-v -O3
+// 2080 是 sm_75 计算能力不足，无法使用cp.async 

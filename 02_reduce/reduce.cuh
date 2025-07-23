@@ -3,6 +3,8 @@
 #include <cooperative_groups.h>
 using namespace cooperative_groups;
 
+#define FLOAT4(value) (reinterpret_cast<float4*>(&(value))[0])
+
 #ifdef USE_DP
     typedef double real;
 #else
@@ -185,4 +187,40 @@ void __global__ reduce_idle(real *d_x, real *d_y, const int N)
     }
 
     if(tid == 0) atomicAdd(d_y, y);
+}
+
+template<int blockSize>
+__global__ void reduce_best(real *d_x, real *d_y, const int N)
+{
+    __shared__ float s_y[blockSize / 32];
+
+    int idx = (blockDim.x * blockIdx.x + threadIdx.x) * 4;
+    int warpId = threadIdx.x / warpSize;
+    int laneId = threadIdx.x & (warpSize - 1);
+
+    float val = 0.0f;
+    if(idx < N) 
+    {
+        float4 tmp_x = FLOAT4(d_x[idx]);
+        val += tmp_x.x;
+        val += tmp_x.y;
+        val += tmp_x.z;
+        val += tmp_x.w;
+    }
+
+    #pragma unroll
+    for(int offset = warpSize >> 1; offset > 0; offset >>= 1) 
+        val += __shfl_down_sync(0xFFFFFFFF, val, offset);
+
+    if(laneId == 0) s_y[warpId] = val;
+    __syncthreads();
+
+    if(warpId == 0)
+    {
+        int warpNum = blockDim.x / warpSize;
+        val = (laneId < warpNum) ? s_y[laneId] : 0.0f;
+        for(int offset = warpSize >> 1; offset > 0; offset >>= 1) 
+            val += __shfl_down_sync(0xFFFFFFFF, val, offset);
+        if(laneId == 0) atomicAdd(d_y, val);
+    }
 }
