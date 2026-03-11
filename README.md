@@ -27,5 +27,7 @@ cuda学习记录
 
 - https://space.bilibili.com/218427631/video
 
+- [Outperforming cuBLAS on H100: a Worklog](https://cudaforfun.substack.com/p/outperforming-cublas-on-h100-a-worklog#footnote-2-152317396)
+
   
 
